@@ -43,54 +43,73 @@ ggplot(newdata, aes(x = factor(SleepQual_Score), y = Score, fill = Indicator)) +
   ) +
   theme_minimal(base_size = 14) +
   theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "none")
-
-anxreg <- cor.test(data$SleepQual_Score, data$Anxiety_Score, method = "spearman")
-ggplot(data, aes(x = SleepQual_Score, y = Anxiety_Score)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
-  annotate("text",
-           x     = 1.5,
-           y     = max(data$Anxiety_Score, na.rm=TRUE) * 0.9,
-           label = paste0("ρ = ", round(anxreg$estimate, 2),
-                          "\np = ", signif(anxreg$p.value, 2)),
-           hjust = 0) +
-  labs(
-    title = "Sleep Quality vs. Anxiety Score",
-    x     = "Sleep Quality",
-    y     = "Anxiety Score"
+  
+anxtest <- cor.test(data$SleepQual_Score, data$Anxiety_Score,  method = "spearman")
+anxrho <- anxtest$estimate
+anxp <- anxtest$p.value
+anxmean <- data %>%
+  group_by(SleepQual_Score) %>%
+  summarise(mean_Anxiety = mean(Anxiety_Score, na.rm = TRUE))
+ggplot(anxmean, aes(x = factor(SleepQual_Score), y = mean_Anxiety)) +
+  geom_col() +
+  annotate(
+    "text",
+    x     = 2, 
+    y     = max(anx_means$mean_Anxiety) * 1.05,
+    label = paste0("ρ = ", round(anxrho, 2),
+                   "\np = ", signif(anxp, 2)),
+    hjust = 0.5
   ) +
-  theme_minimal()
-
-stressreg <- cor.test(data$SleepQual_Score, data$Stress_Level, method = "spearman")
-ggplot(data, aes(x = SleepQual_Score, y = Stress_Level)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "steelblue") +
-  annotate("text",
-           x     = 1.5,
-           y     = max(data$Stress_Level, na.rm=TRUE) * 0.9,
-           label = paste0("ρ = ", round(stressreg$estimate, 2),
-                          "\np = ", signif(stressreg$p.value, 2)),
-           hjust = 0) +
   labs(
-    title = "Figure 6. Sleep Quality vs. Stress Level",
+    title = "Figure 6. Mean Anxiety Score by Sleep Quality",
     x     = "Sleep Quality (1 = Poor, 2 = Average, 3 = Good)",
-    y     = "Stress Level (0–5)"
+    y     = "Mean Anxiety Score"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 14)
 
-depressionreg <- cor.test(data$SleepQual_Score, data$Depression_Score, method = "spearman")
-ggplot(data, aes(x = SleepQual_Score, y = Depression_Score)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "firebrick") +
-  annotate("text",
-           x     = 1.5,
-           y     = max(data$Depression_Score, na.rm=TRUE) * 0.9,
-           label = paste0("ρ = ", round(depressionreg$estimate, 2),
-                          "\np = ", signif(depressionreg$p.value, 2)),
-           hjust = 0) +
-  labs(
-    title = "Figure 8. Sleep Quality vs. Depression Score",
-    x     = "Sleep Quality (1 = Poor, 2 = Average, 3 = Good)",
-    y     = "Depression Score (0–5)"
+stresstest <- cor.test(data$SleepQual_Score, data$Stress_Level, method = "spearman")
+stressrho <- stresstest$estimate
+stressp <- stresstest$p.value
+stressmeans <- data %>%
+  group_by(SleepQual_Score) %>%
+  summarise(mean_Stress = mean(Stress_Level, na.rm = TRUE))
+ggplot(stressmeans, aes(x = factor(SleepQual_Score), y = mean_Stress)) +
+  geom_col() +
+  annotate(
+    "text",
+    x     = 2,
+    y     = max(stressmeans $mean_Stress) * 1.05,
+    label = paste0("ρ = ", round(stressrho, 2),
+                   "\np = ", signif(stressp, 2)),
+    hjust = 0.5
   ) +
-  theme_minimal()
+  labs(
+    title = "Figure 7. Mean Stress Level by Sleep Quality",
+    x     = "Sleep Quality (1 = Poor, 2 = Average, 3 = Good)",
+    y     = "Mean Stress Level"
+  ) +
+  theme_minimal(base_size = 14)
+
+  
+deprtest <- cor.test(data$SleepQual_Score, data$Depression_Score, method = "spearman")
+deprrho <- deprtest$estimate
+deprp <- deprtest$p.value
+deprmeans <- data %>%
+  group_by(SleepQual_Score) %>%
+  summarise(mean_Depression = mean(Depression_Score, na.rm = TRUE))
+ggplot(deprmeans, aes(x = factor(SleepQual_Score), y = mean_Depression)) +
+  geom_col() +
+  annotate(
+    "text",
+    x     = 2,
+    y     = max(deprmeans$mean_Depression) * 1.05,
+    label = paste0("ρ = ", round(deprrho, 2),
+                   "\np = ", signif(deprp, 2)),
+    hjust = 0.5
+  ) +
+  labs(
+    title = "Figure 8. Mean Depression Score by Sleep Quality",
+    x     = "Sleep Quality (1 = Poor, 2 = Average, 3 = Good)",
+    y     = "Mean Depression Score"
+  ) +
+  theme_minimal(base_size = 14)
